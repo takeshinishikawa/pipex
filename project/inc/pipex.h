@@ -3,6 +3,7 @@
 
 # include <stdio.h> //tirar printf e incluid libc
 # include <unistd.h> //execve
+# include <fcntl.h> //read() open()
 # include <time.h> //verificar se eh necessario
 # include <sys/wait.h>
 # include <sys/types.h>
@@ -13,27 +14,30 @@
 
 #define PROGRAM_NAME "./pipex"
 #define QUOTATION_MARKS "\"" //check if really needs to maintain
-#define MAX_FLAGS 256
 
-/*typedef struct s_cmd
+typedef struct s_list
 {
-	int		id;
-	char	*cmd[id][MAX_FLAGS];
-}	t_cmd;*/
+	void			*content;
+	struct s_list	*next;
+}	t_list;
 
-
-typedef struct s_argv
+typedef struct s_pipex
 {
 	char	*infile;
+	int		infile_fd;
 	char	*outfile;
-	char	*commands;
-}	t_argv;
-
+	int		outfile_fd;
+	int		cmd_qty;
+	int		offset;
+	t_list	*cmd_list;
+}	t_pipex;
 
 
 size_t	ft_strlen(const char *s);
-int	ft_strncmp(const char *s1, const char *s2, size_t n);
-int	check_args(int argc, char *argv[]);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+int		check_args(int argc, char *argv[]);
 char	*ft_strtoken(char **str, char token);
+char	**ft_split(char const *s, char c);
+//incluir funções de lista
 
 #endif

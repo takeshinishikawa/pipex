@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2021/12/22 22:02:54 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/07 20:43:27 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,36 @@ int	flags_number(char *cmd, char token)
 	return (flags);
 }
 
-int	init_pipex(int argc, char *argv[], t_argv *pipex)
+int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 {
-	int		cmd;
+	pipex->infile = argv[1];
+	pipex->infile_fd = open(pipex->infile, O_RDONLY);
+	pipex->outfile = argv[argc - 1];
+	pipex->outfile_fd = open(pipex->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (pipex->outfile_fd == -1)
+	{
+		perror("Error");
+		return (errno);
+	}
+	pipex->cmd_qty = argc - 3;
+	pipex->offset = 2;
+	pipex->cmd_list = get_cmd_list(argv, pipex->offset);
+	while (pipex->offset < argc)
+	{
+		pipex->cmd_list->content = ft_split(argv[pipex->offset], ' ');
+		printf("%s\n", (char *)pipex->cmd_list->content);
+
+		if (pipex->offset == 2)
+		{
+			//criar a lista com o primeiro comando
+		}
+		else
+		{
+			//adicionar ao final da lista os demais comandos
+		}
+		pipex->offset++;
+	}
+	/*int		cmd;
 	size_t	list_n;
 	size_t	arg;
 
@@ -70,11 +97,9 @@ int	init_pipex(int argc, char *argv[], t_argv *pipex)
 			//free(piece);
 		}
 		cmd++;
-	}
+	}*/
 	return (0);
 }
-
-
 
 /**
  * @Just the main calls
@@ -86,19 +111,20 @@ int	init_pipex(int argc, char *argv[], t_argv *pipex)
  */
 int	main(int argc, char *argv[], char *envp[])
 {
-	t_argv	pipex;
+	t_pipex	pipex;
 
 	if (check_args(argc, argv))
 		return (1);
-	if (init_pipex(argc, argv, &pipex))
+	if (init_pipex(argc, argv, envp, &pipex))
 		return (1);
-	int i;
+
+	(void) envp;
+	/*int i;
 
 	i = -1;
 	while (envp[++i] != NULL)
-		//printf("%s\n", envp[i]);
+		printf("%s\n", envp[i]);
 
-	/*
 	int	pipefd[2];
 	int	i;		close(pipefd[0]);
 		write(fd[1], result, sizeof(result));

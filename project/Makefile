@@ -2,7 +2,7 @@ NAME = pipex
 
 CFLAGS = -Wall -Wextra -Werror -g -ggdb3
 
-SRC = main.c $(addprefix src/, ft_strlen.c ft_strncmp.c check_args.c ft_strtoken.c)
+SRC = main.c $(addprefix src/, ft_strlen.c ft_strncmp.c check_args.c ft_strtoken.c ft_split.c)
 
 INC = ./inc/pipex.h
 
