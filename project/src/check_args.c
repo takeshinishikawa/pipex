@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/15 21:06:02 by rtakeshi          #+#    #+#             */
-/*   Updated: 2021/12/22 18:58:35 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/09 21:37:31 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static int	check_argc(int argc)
  * Program name must be pipex
  * So, the exec is "/pipex"
  */
-static int	check_name(char *argv)
+/*static int	check_name(char *argv)
 {
 	int	strlen;
 
@@ -63,7 +63,7 @@ static int	check_name(char *argv)
 		return (1);
 	}
 	return (0);
-}
+}*/
 
 int	check_args(int argc, char *argv[])
 {
@@ -72,8 +72,8 @@ int	check_args(int argc, char *argv[])
 	i = 0;
 	if (check_argc(argc) != 0)
 		return (1);
-	if (check_name(argv[i++]) != 0)
-		return (1);
+	/*if (check_name(argv[i++]) != 0)
+		return (1);*/
 	if (check_infile(argv[i]) != 0)
 		return (1);
 	return (0);

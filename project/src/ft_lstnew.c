@@ -6,11 +6,11 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/05 12:05:21 by rtakeshi          #+#    #+#             */
-/*   Updated: 2021/09/05 12:05:21 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/09 18:01:21 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../inc/pipex.h"
 
 t_list	*ft_lstnew(void *content)
 {

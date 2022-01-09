@@ -6,16 +6,10 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/07 20:43:27 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/09 22:00:50 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h> //tirar printf e incluid libc
-#include <unistd.h> //execve
-#include <time.h> //verificar se eh necessario
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <stdlib.h>
 #include "./inc/pipex.h"
 
 int	flags_number(char *cmd, char token)
@@ -40,6 +34,47 @@ int	flags_number(char *cmd, char token)
 	return (flags);
 }
 
+/**
+ * @brief Fill the cmd list object
+ *
+ * Fill commands considering a space character as split token
+ * Model is flexibe to receive as many commands as needed
+ */
+t_list	*get_cmd_list(char *argv[], int offset, t_pipex *pipex)
+{
+	t_list *cmd_lst;
+	int i;
+
+	cmd_lst = NULL;
+	i = 0;
+	while (i < pipex->cmd_qty)
+	{
+		if (i == 0)
+			cmd_lst = ft_lstnew(ft_split(argv[i + offset], ' '));
+		else
+			ft_lstadd_back(&cmd_lst, ft_lstnew(ft_split(argv[i + offset], ' ')));
+		i++;
+	}
+	return (cmd_lst);
+}
+
+int	get_path(t_pipex *pipex, char *envp[])
+{
+
+}
+
+/**
+ * @initiate function data structure
+ *
+ * @param argc given by the user in program execution
+ * @param argv[0]: program name
+ * @param argv[1]: infile location/name
+ * @param argv[2 ~ (argc - 2)]: commands
+ * @param argv[argc - 1]: outfile location/name
+ * @param envp environment variable -> must get PATH and test with all commands
+ * @param pipex data structure that is used to run the program
+ * @return int status of the program ran
+ */
 int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 {
 	pipex->infile = argv[1];
@@ -53,22 +88,19 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 	}
 	pipex->cmd_qty = argc - 3;
 	pipex->offset = 2;
-	pipex->cmd_list = get_cmd_list(argv, pipex->offset);
-	while (pipex->offset < argc)
-	{
-		pipex->cmd_list->content = ft_split(argv[pipex->offset], ' ');
-		printf("%s\n", (char *)pipex->cmd_list->content);
+	pipex->cmd_lst = get_cmd_list(argv, pipex->offset, pipex);
+	if (get_path(pipex, envp))
+		return (errno);
 
-		if (pipex->offset == 2)
-		{
-			//criar a lista com o primeiro comando
-		}
-		else
-		{
-			//adicionar ao final da lista os demais comandos
-		}
-		pipex->offset++;
+	//test if cmd was correctly filled
+	while (pipex->cmd_qty != 0)
+	{
+		printf("AQUI%s\n", pipex->cmd_lst->content[2]);
+		pipex->cmd_lst = pipex->cmd_lst->next;
+		pipex->cmd_qty--;
 	}
+
+
 	/*int		cmd;
 	size_t	list_n;
 	size_t	arg;
@@ -118,14 +150,14 @@ int	main(int argc, char *argv[], char *envp[])
 	if (init_pipex(argc, argv, envp, &pipex))
 		return (1);
 
-	(void) envp;
-	/*int i;
+	//retirar o parse no path
+	int i;
 
 	i = -1;
 	while (envp[++i] != NULL)
 		printf("%s\n", envp[i]);
 
-	int	pipefd[2];
+	/*int	pipefd[2];
 	int	i;		close(pipefd[0]);
 		write(fd[1], result, sizeof(result));
 		close(fd[1]);

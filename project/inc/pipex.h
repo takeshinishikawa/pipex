@@ -17,7 +17,7 @@
 
 typedef struct s_list
 {
-	void			*content;
+	char			**content;
 	struct s_list	*next;
 }	t_list;
 
@@ -29,15 +29,20 @@ typedef struct s_pipex
 	int		outfile_fd;
 	int		cmd_qty;
 	int		offset;
-	t_list	*cmd_list;
+	t_list	*cmd_lst;
 }	t_pipex;
 
 
 size_t	ft_strlen(const char *s);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-int		check_args(int argc, char *argv[]);
+int	check_args(int argc, char *argv[]);
 char	*ft_strtoken(char **str, char token);
 char	**ft_split(char const *s, char c);
+t_list	*ft_lstnew(void *content);
+void	ft_lstadd_back(t_list **lst, t_list *new);
+t_list	*ft_lstlast(t_list *lst);
+char	*ft_strnstr(const char *haystack, const char *needle, size_t len);
+
 //incluir funções de lista
 
 #endif
