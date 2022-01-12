@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/12 19:48:30 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/12 19:50:49 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,12 @@ int	get_cmd_file(t_list *cmd_lst, char **paths)
 	perror("Error :");
 	return (errno);
 }
-
+/**
+ * @brief find the line that contains "PATH"
+ *
+ * @param envp ENVironment Pointer
+ * @return char* Returns the line that contains "PATH=" without it or NULL if not found
+ */
 char	*find_line(char *envp[])
 {
 	while (*envp)
