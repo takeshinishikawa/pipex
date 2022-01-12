@@ -1,26 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/09/05 12:05:21 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/12 19:04:36 by rtakeshi         ###   ########.fr       */
+/*   Created: 2021/09/05 12:06:36 by rtakeshi          #+#    #+#             */
+/*   Updated: 2022/01/10 00:05:50 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
 
-t_list	*ft_lstnew(void *content)
+void	ft_putstr_fd(char *s, int fd)
 {
-	t_list	*new_element;
-
-	new_element = malloc(sizeof(t_list));
-	if (new_element == NULL)
-		return (NULL);
-	new_element->content = content;
-	new_element->cmd_file = NULL;
-	new_element->next = NULL;
-	return (new_element);
+	if (s == NULL)
+		return ;
+	while (*s)
+	{
+		ft_putchar_fd(*s, fd);
+		s++;
+	}
 }

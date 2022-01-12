@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/09 22:00:50 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/12 19:48:30 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,65 @@ t_list	*get_cmd_list(char *argv[], int offset, t_pipex *pipex)
 	return (cmd_lst);
 }
 
+int	get_cmd_file(t_list *cmd_lst, char **paths)
+{
+	char	*aux;
+
+	aux = NULL;
+	while (*paths)
+	{
+		aux = ft_strjoin(*paths,"\\");
+		if (aux == NULL)
+		{
+			perror("Error :");
+			return(errno);
+		}
+		cmd_lst->cmd_file = ft_strjoin(aux, cmd_lst->content[0]);
+		if (access(cmd_lst->cmd_file, R_OK) != -1)
+		{
+			free (aux);
+			return (0);
+		}
+		paths++;
+	}
+	perror("Error :");
+	return (errno);
+}
+
+char	*find_line(char *envp[])
+{
+	while (*envp)
+	{
+		if (ft_strnstr(*envp, "PATH=", 5))
+			return(*envp + 5);
+		envp++;
+	}
+	return (NULL);
+}
+
+
 int	get_path(t_pipex *pipex, char *envp[])
 {
+	char	*aux_path;
 
+	aux_path = NULL;
+	pipex->paths = NULL;
+	if (!(aux_path = find_line(envp)))
+		return (-1);
+	pipex->paths = ft_split(aux_path, ':');
+	/*while (*(pipex->paths))
+	{
+		printf("%s\n", *(pipex->paths));
+		pipex->paths++;
+	}*/
+	while(*(pipex->cmd_lst->content))
+	{
+		if (!get_cmd_file(pipex->cmd_lst, pipex->paths))
+			return (errno);
+		pipex->cmd_lst = pipex->cmd_lst->next;
+	}
+
+	return(0);
 }
 
 /**
@@ -95,7 +151,7 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 	//test if cmd was correctly filled
 	while (pipex->cmd_qty != 0)
 	{
-		printf("AQUI%s\n", pipex->cmd_lst->content[2]);
+		printf("AQUI %s\n", pipex->cmd_lst->content[0]);
 		pipex->cmd_lst = pipex->cmd_lst->next;
 		pipex->cmd_qty--;
 	}
@@ -149,13 +205,6 @@ int	main(int argc, char *argv[], char *envp[])
 		return (1);
 	if (init_pipex(argc, argv, envp, &pipex))
 		return (1);
-
-	//retirar o parse no path
-	int i;
-
-	i = -1;
-	while (envp[++i] != NULL)
-		printf("%s\n", envp[i]);
 
 	/*int	pipefd[2];
 	int	i;		close(pipefd[0]);
