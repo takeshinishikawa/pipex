@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/12 19:50:49 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/13 18:27:50 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,13 @@ int	flags_number(char *cmd, char token)
  * Fill commands considering a space character as split token
  * Model is flexibe to receive as many commands as needed
  */
-t_list	*get_cmd_list(char *argv[], int offset, t_pipex *pipex)
+t_list	*get_cmd_list(char *argv[], int offset, int cmd_qty)
 {
 	t_list *cmd_lst;
 	int i;
 
-	cmd_lst = NULL;
 	i = 0;
-	while (i < pipex->cmd_qty)
+	while (i < cmd_qty)
 	{
 		if (i == 0)
 			cmd_lst = ft_lstnew(ft_split(argv[i + offset], ' '));
@@ -61,25 +60,26 @@ t_list	*get_cmd_list(char *argv[], int offset, t_pipex *pipex)
 int	get_cmd_file(t_list *cmd_lst, char **paths)
 {
 	char	*aux;
+	int		fd;
 
 	aux = NULL;
 	while (*paths)
 	{
-		aux = ft_strjoin(*paths,"\\");
+		aux = ft_strjoin(*paths,"/");
 		if (aux == NULL)
 		{
 			perror("Error :");
 			return(errno);
 		}
 		cmd_lst->cmd_file = ft_strjoin(aux, cmd_lst->content[0]);
-		if (access(cmd_lst->cmd_file, R_OK) != -1)
-		{
-			free (aux);
+		free(aux);
+		fd = access(cmd_lst->cmd_file, R_OK);
+		if (fd != -1)
 			return (0);
-		}
+		free (cmd_lst->cmd_file);
 		paths++;
 	}
-	perror("Error :");
+	perror("Error");
 	return (errno);
 }
 /**
@@ -103,24 +103,37 @@ char	*find_line(char *envp[])
 int	get_path(t_pipex *pipex, char *envp[])
 {
 	char	*aux_path;
+	t_list	*tmp;
 
 	aux_path = NULL;
 	pipex->paths = NULL;
+	tmp = pipex->cmd_lst;
 	if (!(aux_path = find_line(envp)))
 		return (-1);
+
+	printf("\n\n");
+	printf("%s\n", aux_path);
+	printf("\n\n");
+
 	pipex->paths = ft_split(aux_path, ':');
-	/*while (*(pipex->paths))
+
+	printf("\n\n");
+	int i = 0;
+	while (pipex->paths[i])
 	{
-		printf("%s\n", *(pipex->paths));
-		pipex->paths++;
-	}*/
-	while(*(pipex->cmd_lst->content))
+		printf("%s\n", (pipex->paths[i]));
+		i++;
+	}
+	printf("\n\n");
+
+	while((pipex->cmd_lst))
 	{
-		if (!get_cmd_file(pipex->cmd_lst, pipex->paths))
+		if (get_cmd_file(pipex->cmd_lst, pipex->paths))
 			return (errno);
+		printf("%s\n", pipex->cmd_lst->cmd_file);
 		pipex->cmd_lst = pipex->cmd_lst->next;
 	}
-
+	pipex->cmd_lst = tmp;
 	return(0);
 }
 
@@ -149,48 +162,19 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 	}
 	pipex->cmd_qty = argc - 3;
 	pipex->offset = 2;
-	pipex->cmd_lst = get_cmd_list(argv, pipex->offset, pipex);
+	pipex->cmd_lst = get_cmd_list(argv, pipex->offset, pipex->cmd_qty);
 	if (get_path(pipex, envp))
 		return (errno);
-
 	//test if cmd was correctly filled
-	while (pipex->cmd_qty != 0)
+	/*while (pipex->cmd_qty != 0)
 	{
 		printf("AQUI %s\n", pipex->cmd_lst->content[0]);
+		printf("AQUI %s\n", pipex->cmd_lst->content[1]);
+		printf("AQUI %s\n\n", pipex->cmd_lst->content[2]);
 		pipex->cmd_lst = pipex->cmd_lst->next;
 		pipex->cmd_qty--;
-	}
-
-
-	/*int		cmd;
-	size_t	list_n;
-	size_t	arg;
-
-	pipex->commands = (char *)(sizeof(char *) * (argc - 3));
-	if (pipex->commands == NULL)
-	{
-		printf("deu ruim\n");//ajustar o perror
-		return (1);//verificar o codigo correto
-	}
-	if (!argv[0])
-		printf("sem argv0"); //retirar essa checagem
-	flags_number(argv[2], ' ');
-	cmd = 0;
-	while (cmd < (argc - 2))
-	{
-		list_n = 0;
-		arg = 0;
-		list_n = flags_number(argv[cmd + 2], ' ');
-		pipex->commands[cmd] = malloc(sizeof(char *) * (list_n + 2));
-		while (*argv[cmd + 2])
-		{
-			pipex->commands[cmd][arg] = ft_strtoken(&argv[cmd + 2], ' ');
-			printf("'%s'\n", pipex->commands[cmd][arg]);
-			printf("'%s'\n\n", argv[cmd + 2]);
-			//free(piece);
-		}
-		cmd++;
 	}*/
+
 	return (0);
 }
 
@@ -253,6 +237,42 @@ int	main(int argc, char *argv[], char *envp[])
 	}
 
 */
+
+//trying to clean var pipex.paths
+	char	*aux;
+	char	**start;
+
+	start = pipex.paths;
+	while (*pipex.paths)
+	{
+		aux = *pipex.paths;
+		printf("%s\n", aux);
+		pipex.paths++;
+		free(aux);
+	}
+	pipex.paths = start;
+	free(pipex.paths);
+
+//clean pipex cmd_struct
+	t_list	*temp;
+	int		i;
+
+	while (pipex.cmd_lst != NULL)
+	{
+		temp = pipex.cmd_lst;
+		i = 0;
+		pipex.cmd_lst = pipex.cmd_lst->next;
+		free(temp->cmd_file);
+		while (temp->content[i])
+		{
+			printf("%s\n", temp->content[i]);
+			free(temp->content[i]);
+			i++;
+		}
+		free(temp->content);
+		free(temp);
+	}
+
 
 
 	return (0);

@@ -26,5 +26,5 @@ re: 	fclean all
 runleak:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -v ./$(NAME) "infile" "cmd a b c" "cmd" "outfile"
 
-run:
-	./$(NAME) "infile" "cmd1 a b c " "cmd2 d e f" "outfile"
+run:	all
+	./$(NAME) "infile" "tr a b " "tr b c" "outfile"
