@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/13 18:27:50 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/13 19:45:20 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ int	get_cmd_file(t_list *cmd_lst, char **paths)
 		if (fd != -1)
 			return (0);
 		free (cmd_lst->cmd_file);
+		cmd_lst->cmd_file = NULL;
 		paths++;
 	}
 	perror("Error");
@@ -96,6 +97,7 @@ char	*find_line(char *envp[])
 			return(*envp + 5);
 		envp++;
 	}
+	ft_putstr_fd("PATH not found.\n", 1);
 	return (NULL);
 }
 
@@ -103,37 +105,26 @@ char	*find_line(char *envp[])
 int	get_path(t_pipex *pipex, char *envp[])
 {
 	char	*aux_path;
-	t_list	*tmp;
+	t_list	*head;
 
 	aux_path = NULL;
 	pipex->paths = NULL;
-	tmp = pipex->cmd_lst;
+	head = pipex->cmd_lst;
 	if (!(aux_path = find_line(envp)))
 		return (-1);
-
-	printf("\n\n");
-	printf("%s\n", aux_path);
-	printf("\n\n");
-
 	pipex->paths = ft_split(aux_path, ':');
-
-	printf("\n\n");
-	int i = 0;
-	while (pipex->paths[i])
-	{
-		printf("%s\n", (pipex->paths[i]));
-		i++;
-	}
-	printf("\n\n");
-
 	while((pipex->cmd_lst))
 	{
 		if (get_cmd_file(pipex->cmd_lst, pipex->paths))
+		{
+			pipex->cmd_lst = head;
 			return (errno);
-		printf("%s\n", pipex->cmd_lst->cmd_file);
+		}
+		//printf("%s\n", pipex->cmd_lst->cmd_file);
+		//include a call to exec
 		pipex->cmd_lst = pipex->cmd_lst->next;
 	}
-	pipex->cmd_lst = tmp;
+	pipex->cmd_lst = head;
 	return(0);
 }
 
@@ -179,6 +170,59 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 }
 
 /**
+ * @brief free command list structure (char *cmd_file and char **content)
+ *
+ * @param pipex used to get the cmd_lst t_list * variable
+ */
+void	clear_cmd_lst(t_pipex *pipex)
+{
+	t_list	*temp;
+	int		i;
+
+	if (!pipex->cmd_lst)
+		return ;
+	while (pipex->cmd_lst != NULL)
+	{
+		temp = pipex->cmd_lst;
+		i = 0;
+		pipex->cmd_lst = pipex->cmd_lst->next;
+		if (temp->cmd_file)
+			free(temp->cmd_file);
+		while (temp->content[i])
+		{
+			free(temp->content[i]);
+			i++;
+		}
+		free(temp->content);
+		free(temp);
+	}
+	return ;
+}
+
+/**
+ * @brief free the paths variable
+ *
+ * @param pipex used to get the paths char ** variable
+ */
+void	clear_paths(t_pipex	*pipex)
+{
+	char	*aux;
+	char	**start;
+
+	if (!pipex->paths)
+		return ;
+	start = pipex->paths;
+	while (*pipex->paths)
+	{
+		aux = *pipex->paths;
+		pipex->paths++;
+		free(aux);
+	}
+	pipex->paths = start;
+	free(pipex->paths);
+	return ;
+}
+/**
  * @Just the main calls
  *
  * @param argc at least 5
@@ -193,7 +237,11 @@ int	main(int argc, char *argv[], char *envp[])
 	if (check_args(argc, argv))
 		return (1);
 	if (init_pipex(argc, argv, envp, &pipex))
+	{
+		clear_paths(&pipex);
+		clear_cmd_lst(&pipex);
 		return (1);
+	}
 
 	/*int	pipefd[2];
 	int	i;		close(pipefd[0]);
@@ -235,45 +283,10 @@ int	main(int argc, char *argv[], char *envp[])
 		read(fd[0], result, sizeof(result));
 		close(fd[0]);
 	}
-
 */
 
-//trying to clean var pipex.paths
-	char	*aux;
-	char	**start;
-
-	start = pipex.paths;
-	while (*pipex.paths)
-	{
-		aux = *pipex.paths;
-		printf("%s\n", aux);
-		pipex.paths++;
-		free(aux);
-	}
-	pipex.paths = start;
-	free(pipex.paths);
-
-//clean pipex cmd_struct
-	t_list	*temp;
-	int		i;
-
-	while (pipex.cmd_lst != NULL)
-	{
-		temp = pipex.cmd_lst;
-		i = 0;
-		pipex.cmd_lst = pipex.cmd_lst->next;
-		free(temp->cmd_file);
-		while (temp->content[i])
-		{
-			printf("%s\n", temp->content[i]);
-			free(temp->content[i]);
-			i++;
-		}
-		free(temp->content);
-		free(temp);
-	}
-
-
+	clear_paths(&pipex);
+	clear_cmd_lst(&pipex);
 
 	return (0);
 }
