@@ -6,13 +6,13 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/13 19:45:20 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/14 00:46:48 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./inc/pipex.h"
 
-int	flags_number(char *cmd, char token)
+/*int	flags_number(char *cmd, char token)
 {
 	int		len;
 	int		flags;
@@ -32,7 +32,7 @@ int	flags_number(char *cmd, char token)
 	}
 	printf("\n\nflags = %d\n\n", flags);
 	return (flags);
-}
+}*/
 
 /**
  * @brief Fill the cmd list object
@@ -40,7 +40,7 @@ int	flags_number(char *cmd, char token)
  * Fill commands considering a space character as split token
  * Model is flexibe to receive as many commands as needed
  */
-t_list	*get_cmd_list(char *argv[], int offset, int cmd_qty)
+t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty)
 {
 	t_list *cmd_lst;
 	int i;
@@ -120,12 +120,27 @@ int	get_path(t_pipex *pipex, char *envp[])
 			pipex->cmd_lst = head;
 			return (errno);
 		}
-		//printf("%s\n", pipex->cmd_lst->cmd_file);
-		//include a call to exec
 		pipex->cmd_lst = pipex->cmd_lst->next;
 	}
 	pipex->cmd_lst = head;
 	return(0);
+}
+
+int	get_fd(t_pipex *pipex)
+{
+	pipex->infile_fd = open(pipex->infile, O_RDONLY);
+	if (pipex->infile_fd == -1)
+	{
+		perror("Error");
+		return (errno);
+	}
+	pipex->outfile_fd = open(pipex->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (pipex->outfile_fd == -1)
+	{
+		perror("Error");
+		return (errno);
+	}
+	return (0);
 }
 
 /**
@@ -143,17 +158,14 @@ int	get_path(t_pipex *pipex, char *envp[])
 int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 {
 	pipex->infile = argv[1];
-	pipex->infile_fd = open(pipex->infile, O_RDONLY);
 	pipex->outfile = argv[argc - 1];
-	pipex->outfile_fd = open(pipex->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (pipex->outfile_fd == -1)
-	{
-		perror("Error");
-		return (errno);
-	}
 	pipex->cmd_qty = argc - 3;
 	pipex->offset = 2;
-	pipex->cmd_lst = get_cmd_list(argv, pipex->offset, pipex->cmd_qty);
+	pipex->cmd_lst = NULL;
+	pipex->paths = NULL;
+	if (get_fd(pipex))
+		return (errno);
+	pipex->cmd_lst = get_cmd_lst(argv, pipex->offset, pipex->cmd_qty);
 	if (get_path(pipex, envp))
 		return (errno);
 	//test if cmd was correctly filled
@@ -244,7 +256,8 @@ int	main(int argc, char *argv[], char *envp[])
 	}
 
 	/*int	pipefd[2];
-	int	i;		close(pipefd[0]);
+	int	i;
+	close(pipefd[0]);
 		write(fd[1], result, sizeof(result));
 		close(fd[1]);
 
