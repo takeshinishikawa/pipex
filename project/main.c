@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/14 00:46:48 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/14 15:21:59 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,115 +35,6 @@
 }*/
 
 /**
- * @brief Fill the cmd list object
- *
- * Fill commands considering a space character as split token
- * Model is flexibe to receive as many commands as needed
- */
-t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty)
-{
-	t_list *cmd_lst;
-	int i;
-
-	i = 0;
-	while (i < cmd_qty)
-	{
-		if (i == 0)
-			cmd_lst = ft_lstnew(ft_split(argv[i + offset], ' '));
-		else
-			ft_lstadd_back(&cmd_lst, ft_lstnew(ft_split(argv[i + offset], ' ')));
-		i++;
-	}
-	return (cmd_lst);
-}
-
-int	get_cmd_file(t_list *cmd_lst, char **paths)
-{
-	char	*aux;
-	int		fd;
-
-	aux = NULL;
-	while (*paths)
-	{
-		aux = ft_strjoin(*paths,"/");
-		if (aux == NULL)
-		{
-			perror("Error :");
-			return(errno);
-		}
-		cmd_lst->cmd_file = ft_strjoin(aux, cmd_lst->content[0]);
-		free(aux);
-		fd = access(cmd_lst->cmd_file, R_OK);
-		if (fd != -1)
-			return (0);
-		free (cmd_lst->cmd_file);
-		cmd_lst->cmd_file = NULL;
-		paths++;
-	}
-	perror("Error");
-	return (errno);
-}
-/**
- * @brief find the line that contains "PATH"
- *
- * @param envp ENVironment Pointer
- * @return char* Returns the line that contains "PATH=" without it or NULL if not found
- */
-char	*find_line(char *envp[])
-{
-	while (*envp)
-	{
-		if (ft_strnstr(*envp, "PATH=", 5))
-			return(*envp + 5);
-		envp++;
-	}
-	ft_putstr_fd("PATH not found.\n", 1);
-	return (NULL);
-}
-
-
-int	get_path(t_pipex *pipex, char *envp[])
-{
-	char	*aux_path;
-	t_list	*head;
-
-	aux_path = NULL;
-	pipex->paths = NULL;
-	head = pipex->cmd_lst;
-	if (!(aux_path = find_line(envp)))
-		return (-1);
-	pipex->paths = ft_split(aux_path, ':');
-	while((pipex->cmd_lst))
-	{
-		if (get_cmd_file(pipex->cmd_lst, pipex->paths))
-		{
-			pipex->cmd_lst = head;
-			return (errno);
-		}
-		pipex->cmd_lst = pipex->cmd_lst->next;
-	}
-	pipex->cmd_lst = head;
-	return(0);
-}
-
-int	get_fd(t_pipex *pipex)
-{
-	pipex->infile_fd = open(pipex->infile, O_RDONLY);
-	if (pipex->infile_fd == -1)
-	{
-		perror("Error");
-		return (errno);
-	}
-	pipex->outfile_fd = open(pipex->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (pipex->outfile_fd == -1)
-	{
-		perror("Error");
-		return (errno);
-	}
-	return (0);
-}
-
-/**
  * @initiate function data structure
  *
  * @param argc given by the user in program execution
@@ -168,72 +59,10 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 	pipex->cmd_lst = get_cmd_lst(argv, pipex->offset, pipex->cmd_qty);
 	if (get_path(pipex, envp))
 		return (errno);
-	//test if cmd was correctly filled
-	/*while (pipex->cmd_qty != 0)
-	{
-		printf("AQUI %s\n", pipex->cmd_lst->content[0]);
-		printf("AQUI %s\n", pipex->cmd_lst->content[1]);
-		printf("AQUI %s\n\n", pipex->cmd_lst->content[2]);
-		pipex->cmd_lst = pipex->cmd_lst->next;
-		pipex->cmd_qty--;
-	}*/
-
 	return (0);
 }
 
-/**
- * @brief free command list structure (char *cmd_file and char **content)
- *
- * @param pipex used to get the cmd_lst t_list * variable
- */
-void	clear_cmd_lst(t_pipex *pipex)
-{
-	t_list	*temp;
-	int		i;
 
-	if (!pipex->cmd_lst)
-		return ;
-	while (pipex->cmd_lst != NULL)
-	{
-		temp = pipex->cmd_lst;
-		i = 0;
-		pipex->cmd_lst = pipex->cmd_lst->next;
-		if (temp->cmd_file)
-			free(temp->cmd_file);
-		while (temp->content[i])
-		{
-			free(temp->content[i]);
-			i++;
-		}
-		free(temp->content);
-		free(temp);
-	}
-	return ;
-}
-
-/**
- * @brief free the paths variable
- *
- * @param pipex used to get the paths char ** variable
- */
-void	clear_paths(t_pipex	*pipex)
-{
-	char	*aux;
-	char	**start;
-
-	if (!pipex->paths)
-		return ;
-	start = pipex->paths;
-	while (*pipex->paths)
-	{
-		aux = *pipex->paths;
-		pipex->paths++;
-		free(aux);
-	}
-	pipex->paths = start;
-	free(pipex->paths);
-	return ;
-}
 /**
  * @Just the main calls
  *
@@ -250,8 +79,8 @@ int	main(int argc, char *argv[], char *envp[])
 		return (1);
 	if (init_pipex(argc, argv, envp, &pipex))
 	{
-		clear_paths(&pipex);
-		clear_cmd_lst(&pipex);
+		free_paths(&pipex);
+		free_cmd_lst(&pipex);
 		return (1);
 	}
 
@@ -298,8 +127,8 @@ int	main(int argc, char *argv[], char *envp[])
 	}
 */
 
-	clear_paths(&pipex);
-	clear_cmd_lst(&pipex);
+	free_paths(&pipex);
+	free_cmd_lst(&pipex);
 
 	return (0);
 }
