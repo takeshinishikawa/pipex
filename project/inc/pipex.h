@@ -29,6 +29,7 @@ typedef struct s_pipex
 	char	*outfile;
 	int		outfile_fd;
 	int		cmd_qty;
+	int		exec_cmd;//trying to make execution
 	int		offset;
 	t_list	*cmd_lst;
 	char	**paths;
