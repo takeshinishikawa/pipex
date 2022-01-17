@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/17 00:42:18 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/17 01:26:56 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,29 +172,40 @@ int	exec_pipex(t_pipex *pipex)
 	int		fd[2];
 	t_list	*head;
 	int		i;
+	int		w_status;
 	//fd[0] -> read
 	//fd[1] -> write
 
-	pipe(fd);
-	pid = fork();
-	if (!pid)
+	if (pipe(fd) == -1)
 	{
-		dup2(fd[1], 1);
-		close(fd[1]);
-		dup2(pipex->infile_fd, 0);
-		close(pipex->infile_fd);
-		execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, NULL);
+		perror("Error");
+		return (errno);
 	}
-	else
+	pid = fork();
+	if (pid == -1)
 	{
-		wait(NULL);
-		close(fd[1]);
-		pid = fork();
+		perror("Error");
+		return (errno);
+	}
+	while(pipex->cmd_lst)
+	{
+
 		if (!pid)
 		{
-			dup2(fd[0], 0);
+			dup2(fd[1], 1);
 			close(fd[1]);
+			dup2(pipex->infile_fd, 0);
+			close(pipex->infile_fd);
+			execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, NULL);
+		}
+		else
+		{
+			waitpid(pid, &w_status, WNOHANG);
+			close(fd[1]);
+			dup2(fd[0], 0);
+			close(fd[0]);
 			dup2(pipex->outfile_fd, 1);
+			close(pipex->outfile_fd);
 			head = pipex->cmd_lst;
 			pipex->cmd_lst = pipex->cmd_lst->next;
 			//free cmd executed by child process
@@ -210,8 +221,6 @@ int	exec_pipex(t_pipex *pipex)
 			free(head);
 			execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, NULL);
 		}
-		else
-			wait(NULL);
 	}
 	return (0);
 }
@@ -303,7 +312,6 @@ int	main(int argc, char *argv[], char *envp[])
 	{
 		free_paths(&pipex);
 		free_cmd_lst(&pipex);
-		perror("Error");
 		return (errno);
 	}
 
