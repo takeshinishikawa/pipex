@@ -29,4 +29,4 @@ runleak:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -v ./$(NAME) "infile" "cmd a b c" "cmd" "outfile"
 
 run:	all
-	./$(NAME) "infile" "tr a b" "tr b c" "tr c d" "outfile"
+	./$(NAME) "infile" "tr a b" "tr b c" "tr c d" "tr d e" "outfile"

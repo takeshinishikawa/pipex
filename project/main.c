@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/17 01:26:56 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/17 01:59:05 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,7 @@ int	exec_pipex(t_pipex *pipex)
 }*/
 
 //works for 2 cmds
-int	exec_pipex(t_pipex *pipex)
+int	exec_pipex(t_pipex *pipex, int p_fd)
 {
 	pid_t	pid;
 	int		fd[2];
@@ -189,23 +189,27 @@ int	exec_pipex(t_pipex *pipex)
 	}
 	while(pipex->cmd_lst)
 	{
-
 		if (!pid)
 		{
 			dup2(fd[1], 1);
 			close(fd[1]);
-			dup2(pipex->infile_fd, 0);
-			close(pipex->infile_fd);
+			if (p_fd == 0)
+			{
+				dup2(pipex->infile_fd, 0);
+				close(pipex->infile_fd);
+			}
+			else
+			{
+				dup2(p_fd, fd[0]);
+				close(p_fd);
+			}
 			execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, NULL);
 		}
 		else
 		{
 			waitpid(pid, &w_status, WNOHANG);
-			close(fd[1]);
 			dup2(fd[0], 0);
 			close(fd[0]);
-			dup2(pipex->outfile_fd, 1);
-			close(pipex->outfile_fd);
 			head = pipex->cmd_lst;
 			pipex->cmd_lst = pipex->cmd_lst->next;
 			//free cmd executed by child process
@@ -219,6 +223,16 @@ int	exec_pipex(t_pipex *pipex)
 			}
 			free(head->content);
 			free(head);
+			if (pipex->cmd_lst->next)
+			{
+				close(fd[1]);
+				exec_pipex(pipex, fd[0]);
+			}
+			dup2(fd[0], 0);
+			close(fd[0]);
+			dup2(pipex->outfile_fd, 1);
+			close(pipex->outfile_fd);
+			close(fd[1]);
 			execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, NULL);
 		}
 	}
@@ -307,7 +321,7 @@ int	main(int argc, char *argv[], char *envp[])
 		free_cmd_lst(&pipex);
 		return (1);
 	}
-	if (exec_pipex(&pipex))
+	if (exec_pipex(&pipex, 0))
 	//if (exec_pipex(&pipex, pipex.cmd_qty))
 	{
 		free_paths(&pipex);
