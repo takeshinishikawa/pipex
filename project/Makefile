@@ -1,11 +1,11 @@
 NAME = pipex
 
-CFLAGS = -Wall -Wextra -Werror -g -ggdb3
+CFLAGS = -Wall -Wextra -Werror -g -ggdb3 -fsanitize=address
 
 SRC = main.c $(addprefix src/, ft_strlen.c ft_strncmp.c check_args.c \
 	ft_strtoken.c ft_split.c ft_lstnew.c ft_lstadd_back.c ft_lstlast.c \
 	ft_strnstr.c ft_putstr_fd.c ft_putchar_fd.c ft_strjoin.c \
-	free_struct.c init_struct.c)
+	free_struct.c init_pipex.c init_pipex_utils.c exec_pipex.c)
 
 INC = ./inc/pipex.h
 
@@ -29,4 +29,4 @@ runleak:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -v ./$(NAME) "infile" "cmd a b c" "cmd" "outfile"
 
 run:	all
-	./$(NAME) "infile" "tr a b" "tr b c" "tr c d" "tr d e" "outfile"
+	./$(NAME) "infile" "tr a b" "tr b c" "tr c d" "tr d z" "outfile"
