@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 18:59:41 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/17 19:03:14 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/18 22:37:15 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	free_prev_cmd(t_pipex *pipex)
  * @param p_fd pipefd[0] from previous forked process or 0 if first execution
  * @return int
  */
-int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd)
+int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd, char *envp[])
 {
 	if (dup2(fd_write, 1) == -1)
 		return (errno);
@@ -64,7 +64,11 @@ int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd)
 			return (errno);
 		close(p_fd);
 	}
-	execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, NULL);
+	if (execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, envp) == -1)
+	{
+		perror("Error");
+		return (errno);
+	}
 	return (errno);
 }
 
@@ -80,7 +84,7 @@ int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd)
  * @param fd_write pipefd[1] of the current process
  * @return int: 0 if sucess, and errno if error
  */
-int	parent_process(t_pipex *pipex, int fd_read, int fd_write)
+int	parent_process(t_pipex *pipex, int fd_read, int fd_write, char *envp[])
 {
 	if (dup2(fd_read, 0) == -1)
 		return (errno);
@@ -88,13 +92,17 @@ int	parent_process(t_pipex *pipex, int fd_read, int fd_write)
 	if (pipex->cmd_lst->next)
 	{
 		close(fd_write);
-		exec_pipex(pipex, fd_read);
+		exec_pipex(pipex, fd_read, envp);
 	}
 	if (dup2(pipex->outfile_fd, 1) == -1)
 		return (errno);
 	close(pipex->outfile_fd);
 	close(fd_write);
-	execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, NULL);
+	if (execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, envp) == -1)
+	{
+		perror("Error");
+		return (errno);
+	}
 	return (errno);
 }
 
@@ -130,7 +138,7 @@ int	get_fd_and_pid(int *fd, pid_t *pid)
  * others
  * @return int: 0 if completed successfully and errno if any error found
  */
-int	exec_pipex(t_pipex *pipex, int p_fd)
+int	exec_pipex(t_pipex *pipex, int p_fd, char *envp[])
 {
 	pid_t	pid;
 	int		fd[2];
@@ -142,16 +150,16 @@ int	exec_pipex(t_pipex *pipex, int p_fd)
 	{
 		if (!pid)
 		{
-			if (child_process(pipex, fd[0], fd[1], p_fd))
+			if (child_process(pipex, fd[0], fd[1], p_fd, envp))
 				return (errno);
 		}
 		else
 		{
 			waitpid(pid, &w_status, WNOHANG);
 			free_prev_cmd(pipex);
-			if (parent_process(pipex, fd[0], fd[1]))
+			if (parent_process(pipex, fd[0], fd[1], envp))
 				return (errno);
 		}
 	}
-	return (0);
+	return (errno);
 }

@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/17 19:23:57 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/18 23:15:35 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,20 +47,20 @@ int	main(int argc, char *argv[], char *envp[])
 	t_pipex	pipex;
 
 	if (check_args(argc, argv))
-		return (1);
+		exit (EXIT_FAILURE);
 	if (init_pipex(argc, argv, envp, &pipex))
 	{
 		free_paths(&pipex);
 		free_cmd_lst(&pipex);
-		return (errno);
+		exit (errno);
 	}
-	if (exec_pipex(&pipex, 0))
+	if (exec_pipex(&pipex, 0, envp))
 	{
 		free_paths(&pipex);
 		free_cmd_lst(&pipex);
-		return (errno);
+		exit (errno);
 	}
 	free_paths(&pipex);
 	free_cmd_lst(&pipex);
-	return (0);
+	return (errno);
 }

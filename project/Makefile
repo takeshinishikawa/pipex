@@ -18,15 +18,52 @@ all:	 $(SRC)
 
 clean:
 	$(RM) $(OBJ)
-	rm outfile
 
 fclean: clean
 		$(RM) $(NAME)
+		rm outfile
 
 re: 	fclean all
 
-runleak:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -v ./$(NAME) "infile" "cmd a b c" "cmd" "outfile"
-
 run:	all
-	./$(NAME) "infile" "tr a b" "tr b c" "tr c d" "tr d z" "outfile"
+	./$(NAME) infile "tr a b" "tr b c" "tr c d" outfile
+
+runleak:	all
+	valgrind -s --leak-check=full --trace-children=yes --show-leak-kinds=all --track-origins=yes ./$(NAME) infile "tr a b" "tr b c" "tr c d" outfile
+
+rmtestfile:
+	rm test_files/*
+
+test1:
+	< infile | cat > test_files/1outfile_original
+	./$(NAME) infile " " "cat" test_files/1outfile_pipex
+	make testdiff
+
+test2:
+	< infile cat > test_files/2outfile_original
+	./$(NAME) infile cat test_files/2outfile_pipex
+	make testdiff
+
+test3:
+	< infile tr a b | tr b c > test_files/3outfile_original
+	echo $? > test_files/3outfile_original_exit
+	./$(NAME) infile "tr a b" "tr b c" test_files/3outfile_pipex
+	echo $? > test_files/3outfile_pipex_exit
+	diff test_files/3outfile_original test_files/3outfile_pipex
+	diff test_files/3outfile_original_exit test_files/3outfile_pipex_exit
+
+test4:
+	< pipex-tester/assets/deepthought.txt cat | hostname > test_files/4outfile_original
+	echo $? > test_files/4outfile_original_exit
+	./$(NAME) pipex-tester/assets/deepthought.txt "cat" "hostname" test_files/4outfile_pipex
+	echo $? > test_files/4outfile_pipex_exit
+	diff test_files/4outfile_original test_files/4outfile_pipex
+	diff test_files/4outfile_original_exit test_files/4outfile_pipex_exit
+
+test5:
+	< pipex-tester/assets/deepthought.txt grep Now | head -2 > test_files/5outfile_original
+	echo $? > test_files/5outfile_original_exit
+	./$(NAME) pipex-tester/assets/deepthought.txt "grep Now" "head -2" test_files/5outfile_pipex
+	echo $? > test_files/5outfile_pipex_exit
+	diff test_files/5outfile_original test_files/5outfile_pipex
+	diff test_files/5outfile_original_exit test_files/5outfile_pipex_exit

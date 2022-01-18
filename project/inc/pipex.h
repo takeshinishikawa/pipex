@@ -11,8 +11,9 @@
 # include <string.h>
 # include <errno.h>
 # include <sysexits.h>
+# include <stdlib.h>
 
-#define PROGRAM_NAME "./pipex"
+#define PROGRAM_NAME "pipex"
 #define QUOTATION_MARKS "\"" //check if really needs to maintain
 
 typedef struct s_list
@@ -29,10 +30,10 @@ typedef struct s_pipex
 	char	*outfile;
 	int		outfile_fd;
 	int		cmd_qty;
-	int		exec_cmd;//trying to make execution
 	int		offset;
 	t_list	*cmd_lst;
 	char	**paths;
+	char	**env;
 }	t_pipex;
 
 
@@ -57,10 +58,11 @@ int		get_cmd_file(t_list *cmd_lst, char **paths);
 char	*find_line(char *envp[]);
 int		get_path(t_pipex *pipex, char *envp[]);
 int		get_fd(t_pipex *pipex);
-int	exec_pipex(t_pipex *pipex, int p_fd);
+
+int	exec_pipex(t_pipex *pipex, int p_fd, char *envp[]);
 void	free_prev_cmd(t_pipex *pipex);
-int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd);
-int	parent_process(t_pipex *pipex, int fd_read, int fd_write);
+int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd, char *envp[]);
+int	parent_process(t_pipex *pipex, int fd_read, int fd_write, char *envp[]);
 int	get_fd_and_pid(int *fd, pid_t *pid);
 
 
