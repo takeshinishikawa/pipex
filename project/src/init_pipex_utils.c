@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:14:30 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/18 18:36:24 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/19 01:44:04 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty)
  * @param paths -> source of the available paths
  * @return int -> o if SUCCESS and errno if error
  */
-int	get_cmd_file(t_list *cmd_lst, char **paths)
+int	get_cmd_file(t_list *cmd_lst, char **paths, char *envp[])
 {
 	char	*aux;
 	int		fd;
@@ -66,7 +66,8 @@ int	get_cmd_file(t_list *cmd_lst, char **paths)
 		cmd_lst->cmd_file = NULL;
 		paths++;
 	}
-	perror("Error");
+	cmd_not_found(cmd_lst->content[0], envp);
+	errno = 127;
 	return (errno);
 }
 
@@ -110,7 +111,9 @@ int	get_path(t_pipex *pipex, char *envp[])
 	pipex->paths = ft_split(aux_path, ':');
 	while ((pipex->cmd_lst))
 	{
-		if (get_cmd_file(pipex->cmd_lst, pipex->paths))
+		if (!access(pipex->cmd_lst->content[0], F_OK))
+			pipex->cmd_lst->cmd_file = pipex->cmd_lst->content[0];
+		else if (get_cmd_file(pipex->cmd_lst, pipex->paths, envp))
 		{
 			pipex->cmd_lst = head;
 			return (errno);

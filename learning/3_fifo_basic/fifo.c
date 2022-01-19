@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     if (fd == -1)
     {
         printf("open() could not open the file.\n");
-        return (2);        
+        return (2);
     }
 
     int x;
@@ -43,18 +43,18 @@ int main(int argc, char *argv[])
     if (write(fd, &x, sizeof(x)) == -1)
     {
         printf("write() could not write in the file.\n");
-        return (3); 
+        return (3);
     }
-    
+    printf("Wrote the char  \"%c\" into fifo_file\n", x);
     char *buffer;
-    
+
     if (read(fd, buffer, sizeof(buffer)) == -1)
     {
         printf("read() could not read the file.\n");
-        return (3);      
+        return (3);
     }
-    printf("%s\n", buffer);
-    printf("Closing\n");
+    printf("Read into buffer the char \"%s\" from fifo_file\n", buffer);
+    printf("Closing fifo_file\n");
     close(fd);
     printf("Closed\n");
     return (0);

@@ -18,7 +18,6 @@ int main(void)
     {
         int fd;
 
-        
         if ((fd = open("file2.txt", O_WRONLY | O_CREAT, 0777)) == -1)
         {
             printf("Could not open the file.\n");
@@ -31,8 +30,8 @@ int main(void)
     else if (pid > 0)
     {
         wait(NULL);
-        execlp("cat", "cat", "file1.txt", NULL);
-        
+		printf("Ler\n");
+        execlp("cat", "cat", "file2.txt", NULL);
     }
     return (0);
 }

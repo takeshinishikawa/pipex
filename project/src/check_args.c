@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/15 21:06:02 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/18 18:12:31 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/19 02:05:32 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ static int	check_infile(char *file)
 {
 	if (access(file, F_OK))
 	{
+		ft_putstr_fd("cannot open", 1);
+		ft_putstr_fd(file, 1);
 		perror("Error");
 		return (errno);
 	}
@@ -38,9 +40,9 @@ static int	check_argc(int argc)
 	{
 		errno = EINVAL;
 		perror("Error");
-		printf("Pipex needs at least four arguments.\n");
-		printf("The correct pipex usage is \
-		\"./pipex infile \"cmd1\" \"cmd2\" outfile\".\n");
+		ft_putstr_fd("Pipex needs at least four arguments.\n", 1);
+		ft_putstr_fd("The correct pipex usage is \
+		\"./pipex infile \"cmd1\" \"cmd2\" outfile\".\n", 1);
 		return (errno);
 	}
 	return (0);

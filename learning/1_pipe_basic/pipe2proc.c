@@ -11,7 +11,7 @@ int	main(int argc, char* argv[])
 	int	arr_size;
 	int	start;
 	int	end;
-	
+
 /*each pipe need two communication points*/
 	int pipedes[2];
 /*pipe() function opens two fds one for writing "pipedes[1]" and another for reading "pipedes[0]".
@@ -64,7 +64,7 @@ int	main(int argc, char* argv[])
 	{
 		int	sumchild;
 
-/*wait() forces the parent process to wait for the child process execution.*/	
+/*wait() forces the parent process to wait for the child process execution.*/
 		wait(NULL);
 		close(pipedes[1]);
 		read(pipedes[0], &sumchild, sizeof(sumchild));

@@ -30,7 +30,7 @@ int main(void)
             printf("Could not read 'x'.\n");
             return (3);
         }
-        printf("Received x %d.\n", x);
+        printf("Received y %d.\n", x);
         x *= 4;
         if (write(p1[1], &x, sizeof(x) == -1))
         {
@@ -56,8 +56,8 @@ int main(void)
             printf("Could not read 'y'.\n");
             return (6);
         }
-        printf("Read y %d.\n", y);
         wait(NULL);
+		printf("Read y %d.\n", y);
     }
     close(p1[0]);
     close(p1[1]);

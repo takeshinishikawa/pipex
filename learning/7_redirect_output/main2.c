@@ -9,7 +9,7 @@ int main(void)
     int pid;
     int fd;
 
-        
+
     if ((fd = open("file2.txt", O_WRONLY | O_CREAT, 0777)) == -1) // creates a file and specifies its permissions in octal and not decimal
     {
         printf("Could not open the file.\n");
@@ -32,6 +32,7 @@ int main(void)
     {
         wait(NULL);
         printf("%d parent\n", fd);
+		close (fd);
         execlp("cat", "cat", "file2.txt", NULL);
     }
     return (0);

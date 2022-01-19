@@ -4,10 +4,11 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 /**
  * Create a pipe to communicate between two processes
- * 
+ *
  * 1) Create a child process and change the std output
  * sending through a pipe the content read by cat
  * 2) Create another child process and reads from std input
@@ -24,20 +25,20 @@ int main (int argc, char **argv)
     if (pipe(pipefd) == -1)
     {
         printf("Could not create pipe.\n");
-        return (1);
+        return (errno);
     }
     int pid1;
     pid1 = fork();
     if (pid1 < 0)
     {
         printf("Could not fork.\n");
-        return (2);
+        return (errno);
     }
     if (pid1 == 0)
     {
-        //child will cat from txt file0
-        dup2(pipefd[1], STDOUT_FILENO);
+        //child will cat from txt file
         close(pipefd[0]);
+		dup2(pipefd[1], STDOUT_FILENO);
         close(pipefd[1]);
         execlp("cat", "cat", "file.txt", NULL);
     }
@@ -48,10 +49,10 @@ int main (int argc, char **argv)
     if (pid2 < 0)
     {
         printf("Could not fork.\n");
-        return (3);
+        return (errno);
     }
     if (pid2 == 0) //child process will grep "bat" from stdin
-    {    
+    {
         dup2(pipefd[0], STDIN_FILENO);
         close(pipefd[0]);
         close(pipefd[1]);

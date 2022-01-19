@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 19:06:29 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/18 22:33:33 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/19 02:07:27 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 	pipex->offset = 2;
 	pipex->cmd_lst = NULL;
 	pipex->paths = NULL;
-	pipex->env = envp;
+	pipex->envp = envp;
 	if (get_fd(pipex))
 		return (errno);
 	pipex->cmd_lst = get_cmd_lst(argv, pipex->offset, pipex->cmd_qty);

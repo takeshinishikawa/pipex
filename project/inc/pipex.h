@@ -13,8 +13,7 @@
 # include <sysexits.h>
 # include <stdlib.h>
 
-#define PROGRAM_NAME "pipex"
-#define QUOTATION_MARKS "\"" //check if really needs to maintain
+
 
 typedef struct s_list
 {
@@ -33,7 +32,7 @@ typedef struct s_pipex
 	int		offset;
 	t_list	*cmd_lst;
 	char	**paths;
-	char	**env;
+	char	**envp;
 }	t_pipex;
 
 
@@ -54,15 +53,16 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex);
 void	free_cmd_lst(t_pipex *pipex);
 void	free_paths(t_pipex	*pipex);
 t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty);
-int		get_cmd_file(t_list *cmd_lst, char **paths);
+int		get_cmd_file(t_list *cmd_lst, char **paths, char *envp[]);
+void	cmd_not_found(char *str, char *envp[]);
 char	*find_line(char *envp[]);
 int		get_path(t_pipex *pipex, char *envp[]);
 int		get_fd(t_pipex *pipex);
 
-int	exec_pipex(t_pipex *pipex, int p_fd, char *envp[]);
+int	exec_pipex(t_pipex *pipex, int p_fd);
 void	free_prev_cmd(t_pipex *pipex);
-int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd, char *envp[]);
-int	parent_process(t_pipex *pipex, int fd_read, int fd_write, char *envp[]);
+int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd);
+int	parent_process(t_pipex *pipex, int fd_read, int fd_write);
 int	get_fd_and_pid(int *fd, pid_t *pid);
 
 
