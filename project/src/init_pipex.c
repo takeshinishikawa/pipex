@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 19:06:29 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/19 02:07:27 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/20 17:32:22 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
  * @param pipex data structure that is used to run the program
  * @return int status of the program ran
  */
-int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
+void	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 {
 	pipex->infile = argv[1];
 	pipex->outfile = argv[argc - 1];
@@ -33,10 +33,6 @@ int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 	pipex->cmd_lst = NULL;
 	pipex->paths = NULL;
 	pipex->envp = envp;
-	if (get_fd(pipex))
-		return (errno);
-	pipex->cmd_lst = get_cmd_lst(argv, pipex->offset, pipex->cmd_qty);
-	if (get_path(pipex, envp))
-		return (errno);
-	return (0);
+	pipex->previous_fd = 0;
+	pipex->exec_status = 0;
 }

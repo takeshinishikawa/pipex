@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/19 14:50:16 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/21 19:18:03 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,21 +46,19 @@ int	main(int argc, char *argv[], char *envp[])
 {
 	t_pipex	pipex;
 
-	if (check_args(argc, argv))
+	if (check_argc(argc))
 		exit (EXIT_FAILURE);
-	if (init_pipex(argc, argv, envp, &pipex))
+	init_pipex(argc, argv, envp, &pipex);
+	/*if (exec_pipex(&pipex, argv))
 	{
-		free_paths(&pipex);
-		free_cmd_lst(&pipex);
-		exit (errno);
+		//free_cmd_lst(&pipex);
+		if (pipex.outfile_fd == -1 || pipex.infile_fd == -1)
+			return (1);
+		exit (pipex.exec_status);
 	}
-	if (exec_pipex(&pipex, 0))
-	{
-		free_paths(&pipex);
-		free_cmd_lst(&pipex);
-		exit (errno);
-	}
-	free_paths(&pipex);
-	free_cmd_lst(&pipex);
-	return (errno);
+	if (pipex.outfile_fd == -1)
+		return (1);
+	//free_cmd_lst(&pipex);
+	return (pipex.exec_status);*/
+	return(exec_pipex(&pipex, argv));
 }

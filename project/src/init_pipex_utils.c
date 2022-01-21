@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:14:30 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/19 01:44:04 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/21 14:46:27 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty)
  * @param paths -> source of the available paths
  * @return int -> o if SUCCESS and errno if error
  */
-int	get_cmd_file(t_list *cmd_lst, char **paths, char *envp[])
+/*int	get_cmd_file(t_list *cmd_lst, char **paths, char *envp[])
 {
 	char	*aux;
 	int		fd;
@@ -66,8 +66,33 @@ int	get_cmd_file(t_list *cmd_lst, char **paths, char *envp[])
 		cmd_lst->cmd_file = NULL;
 		paths++;
 	}
-	cmd_not_found(cmd_lst->content[0], envp);
-	errno = 127;
+	//cmd_not_found(cmd_lst->content[0], envp);
+	//errno = 127;
+	return (errno);
+}*/
+
+int	get_cmd_file(t_list *cmd_lst, char **paths)
+{
+	char	*aux;
+	int		fd;
+
+	aux = NULL;
+	while (*paths)
+	{
+		aux = ft_strjoin(*paths, "/");
+		if (aux == NULL)
+			break ;
+		cmd_lst->cmd_file = ft_strjoin(aux, cmd_lst->content[0]);
+		free(aux);
+		fd = access(cmd_lst->cmd_file, R_OK);
+		if (fd != -1)
+			return (0);
+		free (cmd_lst->cmd_file);
+		cmd_lst->cmd_file = NULL;
+		paths++;
+	}
+	//cmd_not_found(cmd_lst->content[0], envp);
+	//errno = 127;
 	return (errno);
 }
 
@@ -97,7 +122,7 @@ char	*find_line(char *envp[])
  * @param envp -> source of the PATH line
  * @return int -> o if SUCCESS and errno if error
  */
-int	get_path(t_pipex *pipex, char *envp[])
+/*int	get_path(t_pipex *pipex, char *envp[])
 {
 	char	*aux_path;
 	t_list	*head;
@@ -122,6 +147,26 @@ int	get_path(t_pipex *pipex, char *envp[])
 	}
 	pipex->cmd_lst = head;
 	return (0);
+}*/
+void	get_path(t_pipex *pipex, t_list *cmd_lst, char *envp[])
+{
+	char	*aux_path;
+
+	aux_path = NULL;
+	pipex->paths = NULL;
+	aux_path = find_line(envp);
+	if (!aux_path)
+		return ;
+	pipex->paths = ft_split(aux_path, ':');
+	if (!access(cmd_lst->content[0], F_OK))
+		cmd_lst->cmd_file = cmd_lst->content[0];
+	else
+	{
+		if (get_cmd_file(cmd_lst, pipex->paths))
+			cmd_lst->cmd_file = cmd_lst->content[0];
+	}
+	free_paths(pipex);
+	return ;
 }
 
 /**
@@ -136,8 +181,7 @@ int	get_fd(t_pipex *pipex)
 	pipex->infile_fd = open(pipex->infile, O_RDONLY);
 	if (pipex->infile_fd == -1)
 	{
-		perror("Error");
-		return (errno);
+		file_not_found(pipex->infile, pipex->envp);
 	}
 	pipex->outfile_fd = open(pipex->outfile, \
 		O_WRONLY | O_CREAT | O_TRUNC, 0777);

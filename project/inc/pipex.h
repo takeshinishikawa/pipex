@@ -28,6 +28,8 @@ typedef struct s_pipex
 	int		infile_fd;
 	char	*outfile;
 	int		outfile_fd;
+	int		previous_fd;
+	int		exec_status;
 	int		cmd_qty;
 	int		offset;
 	t_list	*cmd_lst;
@@ -38,7 +40,7 @@ typedef struct s_pipex
 
 size_t	ft_strlen(const char *s);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-int		check_args(int argc, char *argv[]);
+//int		check_args(int argc, char *argv[]);
 char	*ft_strtoken(char **str, char token);
 char	**ft_split(char const *s, char c);
 t_list	*ft_lstnew(void *content);
@@ -49,21 +51,34 @@ void	ft_putstr_fd(char *s, int fd);
 void	ft_putchar_fd(char c, int fd);
 char	*ft_strjoin(char const *s1, char const *s2);
 
-int	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex);
+void	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex);
+int	check_argc(int argc);
 void	free_cmd_lst(t_pipex *pipex);
 void	free_paths(t_pipex	*pipex);
 t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty);
-int		get_cmd_file(t_list *cmd_lst, char **paths, char *envp[]);
+//int		get_cmd_file(t_list *cmd_lst, char **paths, char *envp[]);
+int	get_cmd_file(t_list *cmd_lst, char **paths);
 void	cmd_not_found(char *str, char *envp[]);
 char	*find_line(char *envp[]);
-int		get_path(t_pipex *pipex, char *envp[]);
+//int		get_path(t_pipex *pipex, char *envp[]);
+void	get_path(t_pipex *pipex, t_list *cmd_lst, char *envp[]);
 int		get_fd(t_pipex *pipex);
+void	file_not_found(char *str, char *envp[]);
 
-int	exec_pipex(t_pipex *pipex, int p_fd);
-void	free_prev_cmd(t_pipex *pipex);
-int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_fd);
-int	parent_process(t_pipex *pipex, int fd_read, int fd_write);
-int	get_fd_and_pid(int *fd, pid_t *pid);
+int	exec_pipex(t_pipex *pipex, char *argv[]);
+int	exec_cmd(t_pipex *pipex, int cmd_counter);
+//void	free_prev_cmd(t_pipex *pipex);
+void	free_prev_cmd(t_list *cmd);
+int	child_process(t_pipex *pipex, int fd_read, int fd_write, int p_exec);
+
+int	get_exec_fd(int *fd);
+int	get_pid(int *pid);
+void	get_previous_fd(t_pipex *pipex, int *fd);
+int	get_read_fd(t_pipex *pipex, int fd_read, int cmd_counter);
+int	get_write_fd(t_pipex *pipex, int fd_write, int cmd_counter);
+int	check_exit(int w_status);
+
+int	check_argc_bonus(int argc);
 
 
 //incluir funções de lista
