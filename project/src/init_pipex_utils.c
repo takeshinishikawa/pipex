@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:14:30 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/21 14:46:27 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/28 20:29:02 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ int	get_cmd_file(t_list *cmd_lst, char **paths)
 			break ;
 		cmd_lst->cmd_file = ft_strjoin(aux, cmd_lst->content[0]);
 		free(aux);
+		aux = NULL;
 		fd = access(cmd_lst->cmd_file, R_OK);
 		if (fd != -1)
 			return (0);
@@ -179,16 +180,13 @@ void	get_path(t_pipex *pipex, t_list *cmd_lst, char *envp[])
 int	get_fd(t_pipex *pipex)
 {
 	pipex->infile_fd = open(pipex->infile, O_RDONLY);
+	/*perror("error");
+	printf("%d\n", errno);*/
 	if (pipex->infile_fd == -1)
-	{
-		file_not_found(pipex->infile, pipex->envp);
-	}
+		infile_error(pipex->infile, pipex->envp, errno);
 	pipex->outfile_fd = open(pipex->outfile, \
 		O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (pipex->outfile_fd == -1)
-	{
 		perror("Error");
-		return (errno);
-	}
-	return (0);
+	return (errno);
 }

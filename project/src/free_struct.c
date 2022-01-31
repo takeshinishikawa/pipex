@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:14:30 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/14 15:40:09 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/27 16:16:18 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,21 @@ void	free_cmd_lst(t_pipex *pipex)
 		aux = pipex->cmd_lst;
 		i = 0;
 		pipex->cmd_lst = pipex->cmd_lst->next;
-		if (aux->cmd_file)
+		if (aux->cmd_file && (aux->cmd_file != aux->content[0]))
+		{
 			free(aux->cmd_file);
+			aux->cmd_file = NULL;
+		}
 		while (aux->content[i])
 		{
 			free(aux->content[i]);
+			aux->content[i] = NULL;
 			i++;
 		}
 		free(aux->content);
+		aux->content = NULL;
 		free(aux);
+		aux = NULL;
 	}
 	return ;
 }
@@ -60,8 +66,10 @@ void	free_paths(t_pipex	*pipex)
 		aux = *pipex->paths;
 		pipex->paths++;
 		free(aux);
+		aux = NULL;
 	}
 	pipex->paths = start;
 	free(pipex->paths);
+	pipex->paths = NULL;
 	return ;
 }

@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 19:06:29 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/20 17:32:22 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/27 15:35:07 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,4 @@ void	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex)
 	pipex->paths = NULL;
 	pipex->envp = envp;
 	pipex->previous_fd = 0;
-	pipex->exec_status = 0;
 }
