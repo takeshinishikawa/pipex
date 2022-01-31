@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 18:59:41 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/21 19:52:33 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/27 00:31:52 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,9 @@ int	get_write_fd(t_pipex *pipex, int fd_write, int cmd_counter)
  */
 int	child_process(t_pipex *pipex, int fd_read, int fd_write, int cmd_counter)
 {
-	t_list	*head;
+	//t_list	*head;
 
-	head = pipex->cmd_lst;
+	//head = pipex->cmd_lst;
 	if (get_read_fd(pipex, fd_read, cmd_counter))
 		//return (errno);
 	if (get_write_fd(pipex, fd_write, cmd_counter))
@@ -92,8 +92,8 @@ int	child_process(t_pipex *pipex, int fd_read, int fd_write, int cmd_counter)
 	if (execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, \
 	pipex->envp) == -1)
 	{
-		pipex->cmd_lst = pipex->cmd_lst->next;
-		free_prev_cmd(head);
+		//pipex->cmd_lst = pipex->cmd_lst->next;
+		//free_prev_cmd(head);
 		exit(127);
 	}
 	return (errno);
