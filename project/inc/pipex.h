@@ -29,7 +29,6 @@ typedef struct s_pipex
 	char	*outfile;
 	int		outfile_fd;
 	int		previous_fd;
-	int		exec_status;
 	int		cmd_qty;
 	int		offset;
 	t_list	*cmd_lst;
@@ -63,7 +62,7 @@ char	*find_line(char *envp[]);
 //int		get_path(t_pipex *pipex, char *envp[]);
 void	get_path(t_pipex *pipex, t_list *cmd_lst, char *envp[]);
 int		get_fd(t_pipex *pipex);
-void	file_not_found(char *str, char *envp[]);
+void	infile_error(char *str, char *envp[], int error);
 
 int	exec_pipex(t_pipex *pipex, char *argv[]);
 int	exec_cmd(t_pipex *pipex, int cmd_counter);
@@ -75,6 +74,7 @@ int	get_exec_fd(int *fd);
 int	get_pid(int *pid);
 void	get_previous_fd(t_pipex *pipex, int *fd);
 int	get_read_fd(t_pipex *pipex, int fd_read, int cmd_counter);
+//int	get_read_fd(t_pipex *pipex, int cmd_counter);
 int	get_write_fd(t_pipex *pipex, int fd_write, int cmd_counter);
 int	check_exit(int w_status);
 

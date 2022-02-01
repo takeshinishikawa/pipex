@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 18:59:41 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/21 19:36:59 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/01/31 23:20:53 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,15 +40,23 @@ void	free_prev_cmd(t_list *cmd)
 	int		i;
 
 	i = 0;
+	if (cmd == NULL)
+		return ;
 	if (cmd->cmd_file != cmd->content[0])
+	{
 		free(cmd->cmd_file);
+		cmd->cmd_file = NULL;
+	}
 	while (cmd->content[i])
 	{
 		free(cmd->content[i]);
+		cmd->content[i] = NULL;
 		i++;
 	}
 	free(cmd->content);
+	cmd->content = NULL;
 	free(cmd);
+	cmd = NULL;
 }
 
 /**
@@ -68,7 +76,7 @@ int	get_exec_fd(int *fd)
 	return (0);
 }
 
-int	get_pid(int *pid)
+int	get_pid(pid_t *pid)
 {
 	*pid = fork();
 	if (*pid == -1)
@@ -89,11 +97,21 @@ void	get_previous_fd(t_pipex *pipex, int *fd)
 
 int	check_exit(int w_status)
 {
+	int	exit_status;
+
+	exit_status = 0;
+	if (w_status == -1)
+	{
+		perror("waitipid");
+		return (EXIT_FAILURE);
+	}
+	//printf("\nw_status = %d\n", w_status);
 	if (WIFEXITED(w_status))
 	{
-		w_status = WEXITSTATUS(w_status);
-		if (w_status)
-			return (w_status);
+		exit_status = WEXITSTATUS(w_status);
+		//printf("\nexit_status = %d\n", exit_status);
+		if (exit_status)
+			return (exit_status);
 	}
-	return (0);
+	return (EXIT_SUCCESS);
 }
