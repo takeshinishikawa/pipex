@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/01 17:21:56 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/01 19:03:30 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/03 15:36:41 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,9 @@ void	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex);
 void	free_cmd_lst(t_pipex *pipex);
 void	free_paths(t_pipex	*pipex);
 t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty);
+size_t	get_cmd_len(char *original_cmd);
+char	*get_cmd(char *original_cmd);
+char	**undo_token(char **cmd);
 int		get_cmd_file(t_list *cmd_lst, char **paths);
 char	*find_line(char *envp[]);
 void	get_path(t_pipex *pipex, t_list *cmd_lst, char *envp[]);

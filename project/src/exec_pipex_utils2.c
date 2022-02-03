@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 18:59:41 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/01 16:23:42 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/03 18:13:36 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ int	clean_child_process(t_pipex *pipex, int errnumber)
 		permission_denied(pipex->cmd_lst->content[0], pipex->envp);
 		exit_code = 126;
 	}
+	else
+		perror("error");
 	if (pipex->cmd_lst)
 		free_cmd_lst(pipex);
 	free_paths(pipex);

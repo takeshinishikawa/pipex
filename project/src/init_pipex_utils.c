@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:14:30 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/02 21:51:51 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/03 15:35:53 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,17 @@ t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty)
 {
 	t_list	*cmd_lst;
 	int		i;
+	char	*aux;
 
 	i = 0;
 	while (i < cmd_qty)
 	{
+		aux = get_cmd(argv[i + offset]);
 		if (i == 0)
-			cmd_lst = ft_lstnew(ft_split(argv[i + offset], ' '));
+			cmd_lst = ft_lstnew(undo_token(ft_split(aux, ' ')));
 		else
-			ft_lstadd_back(&cmd_lst, ft_lstnew(\
-			ft_split(argv[i + offset], ' ')));
+			ft_lstadd_back(&cmd_lst, ft_lstnew(undo_token(ft_split(aux, ' '))));
+		free(aux);
 		i++;
 	}
 	return (cmd_lst);
