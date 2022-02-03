@@ -6,94 +6,11 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 18:59:41 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/01 01:04:46 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/01 16:20:04 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
-
-int	get_read_fd(t_pipex *pipex, int fd_read, int cmd_counter)
-//int	get_read_fd(t_pipex *pipex, int cmd_counter)
-{
-	/*if (cmd_counter == 0 && pipex->infile_fd == -1)
-	{
-		if (dup2(fd_read, STDIN_FILENO) == -1)
-		{
-			perror("Error");
-			return (errno);
-		}
-		close(fd_read);
-	}
-	else */if (cmd_counter == 0)
-	{
-		if (dup2(pipex->infile_fd, STDIN_FILENO) == -1)
-		{
-			//perror("Error");
-			free_cmd_lst(pipex);
-			free_paths(pipex);
-			return (errno);
-		}
-		close(pipex->infile_fd);
-		close (fd_read);
-	}
-	else
-	{
-		if (dup2(pipex->previous_fd, STDIN_FILENO) == -1)
-		{
-			perror("Error");
-			return (errno);
-		}
-		close(pipex->previous_fd);
-		close (fd_read);
-	}
-	return (0);
-}
-
-int	get_write_fd(t_pipex *pipex, int fd_write, int cmd_counter)
-{
-	//if (cmd_counter == (pipex->cmd_qty - 1) && !access(pipex->cmd_lst->cmd_file, F_OK))
-	if (cmd_counter == (pipex->cmd_qty - 1))
-	{
-		if (dup2(pipex->outfile_fd, 1) == -1)
-		{
-			perror("error");
-			return (errno);
-		}
-		close(pipex->outfile_fd);
-	}
-	/*else if (cmd_counter == (pipex->cmd_qty - 1) && access(pipex->cmd_lst->cmd_file, F_OK))
-	{
-		if (dup2(STDOUT_FILENO, fd_write) == -1)
-		{
-			perror("error");
-			return (errno);
-		}
-		close(STDIN_FILENO);
-	}*/
-	else
-	{
-		if (dup2(fd_write, 1) == -1)
-		{
-			perror("error");
-			return (errno);
-		}
-		close(fd_write);
-	}
-	return (0);
-}
-
-int	clean_child_process(t_pipex *pipex, int errnumber)
-{
-
-	//perror("error");
-	//close(STDIN_FILENO);
-	if (errnumber == 2)
-		cmd_not_found(pipex->cmd_lst->content[0], pipex->envp);
-	free_cmd_lst(pipex);
-	free_paths(pipex);
-	//printf("%d\n", errnumber);
-	exit (127);
-}
 
 /**
  * @brief execute the child process considering as input
@@ -110,22 +27,16 @@ int	child_process(t_pipex *pipex, int fd_read, int fd_write, int cmd_counter)
 {
 	if (!access(pipex->cmd_lst->cmd_file, F_OK))
 	{
-		//if (get_read_fd(pipex, cmd_counter))
 		if (get_read_fd(pipex, fd_read, cmd_counter))
 			return (errno);
 		if (get_write_fd(pipex, fd_write, cmd_counter))
 			return (errno);
 	}
 	else
-	{
 		close (fd_read);
-		//close (fd_write);
-	}
 	if (execve(pipex->cmd_lst->cmd_file, pipex->cmd_lst->content, \
 	pipex->envp) == -1)
-	{
-		return(clean_child_process(pipex, errno));
-	}
+		return (clean_child_process(pipex, errno));
 	return (0);
 }
 
@@ -168,11 +79,8 @@ int	exec_pipex(t_pipex *pipex, char *argv[])
 	int		exec_status;
 	t_list	*head;
 
-	//pipex->exec_status = get_fd(pipex);
 	get_fd(pipex);
-
 	pipex->cmd_lst = get_cmd_lst(argv, pipex->offset, pipex->cmd_qty);
-
 	cmd_counter = 0;
 	while (pipex->cmd_lst)
 	{
@@ -187,7 +95,6 @@ int	exec_pipex(t_pipex *pipex, char *argv[])
 	}
 	close (pipex->infile_fd);
 	close (pipex->outfile_fd);
-
 	if (access(pipex->outfile, W_OK))
 		exit (EXIT_FAILURE);
 	if (exec_status)

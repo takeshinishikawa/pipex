@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:14:30 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/28 20:29:02 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/02 21:51:51 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,34 +43,6 @@ t_list	*get_cmd_lst(char *argv[], int offset, int cmd_qty)
  * @param paths -> source of the available paths
  * @return int -> o if SUCCESS and errno if error
  */
-/*int	get_cmd_file(t_list *cmd_lst, char **paths, char *envp[])
-{
-	char	*aux;
-	int		fd;
-
-	aux = NULL;
-	while (*paths)
-	{
-		aux = ft_strjoin(*paths, "/");
-		if (aux == NULL)
-		{
-			perror("Error :");
-			return (errno);
-		}
-		cmd_lst->cmd_file = ft_strjoin(aux, cmd_lst->content[0]);
-		free(aux);
-		fd = access(cmd_lst->cmd_file, R_OK);
-		if (fd != -1)
-			return (0);
-		free (cmd_lst->cmd_file);
-		cmd_lst->cmd_file = NULL;
-		paths++;
-	}
-	//cmd_not_found(cmd_lst->content[0], envp);
-	//errno = 127;
-	return (errno);
-}*/
-
 int	get_cmd_file(t_list *cmd_lst, char **paths)
 {
 	char	*aux;
@@ -92,8 +64,6 @@ int	get_cmd_file(t_list *cmd_lst, char **paths)
 		cmd_lst->cmd_file = NULL;
 		paths++;
 	}
-	//cmd_not_found(cmd_lst->content[0], envp);
-	//errno = 127;
 	return (errno);
 }
 
@@ -123,32 +93,6 @@ char	*find_line(char *envp[])
  * @param envp -> source of the PATH line
  * @return int -> o if SUCCESS and errno if error
  */
-/*int	get_path(t_pipex *pipex, char *envp[])
-{
-	char	*aux_path;
-	t_list	*head;
-
-	aux_path = NULL;
-	pipex->paths = NULL;
-	head = pipex->cmd_lst;
-	aux_path = find_line(envp);
-	if (!aux_path)
-		return (-1);
-	pipex->paths = ft_split(aux_path, ':');
-	while ((pipex->cmd_lst))
-	{
-		if (!access(pipex->cmd_lst->content[0], F_OK))
-			pipex->cmd_lst->cmd_file = pipex->cmd_lst->content[0];
-		else if (get_cmd_file(pipex->cmd_lst, pipex->paths, envp))
-		{
-			pipex->cmd_lst = head;
-			return (errno);
-		}
-		pipex->cmd_lst = pipex->cmd_lst->next;
-	}
-	pipex->cmd_lst = head;
-	return (0);
-}*/
 void	get_path(t_pipex *pipex, t_list *cmd_lst, char *envp[])
 {
 	char	*aux_path;
@@ -180,8 +124,6 @@ void	get_path(t_pipex *pipex, t_list *cmd_lst, char *envp[])
 int	get_fd(t_pipex *pipex)
 {
 	pipex->infile_fd = open(pipex->infile, O_RDONLY);
-	/*perror("error");
-	printf("%d\n", errno);*/
 	if (pipex->infile_fd == -1)
 		infile_error(pipex->infile, pipex->envp, errno);
 	pipex->outfile_fd = open(pipex->outfile, \

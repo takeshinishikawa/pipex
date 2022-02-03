@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:14:30 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/27 16:16:18 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/01 16:27:03 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,6 @@ void	free_cmd_lst(t_pipex *pipex)
 	t_list	*aux;
 	int		i;
 
-	if (!pipex->cmd_lst)
-		return ;
 	while (pipex->cmd_lst != NULL)
 	{
 		aux = pipex->cmd_lst;

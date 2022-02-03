@@ -6,7 +6,7 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 18:59:41 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/01/31 23:20:53 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/01 15:09:04 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,24 +17,6 @@
  *
  * @param pipex used to get the current cmd_lst and free it
  */
-/*void	free_prev_cmd(t_pipex *pipex)
-{
-	t_list	*head;
-	int		i;
-
-	head = pipex->cmd_lst;
-	pipex->cmd_lst = pipex->cmd_lst->next;
-	i = 0;
-	if (head->cmd_file)
-		free(head->cmd_file);
-	while (head->content[i])
-	{
-		free(head->content[i]);
-		i++;
-	}
-	free(head->content);
-	free(head);
-}*/
 void	free_prev_cmd(t_list *cmd)
 {
 	int		i;
@@ -105,12 +87,12 @@ int	check_exit(int w_status)
 		perror("waitipid");
 		return (EXIT_FAILURE);
 	}
-	//printf("\nw_status = %d\n", w_status);
 	if (WIFEXITED(w_status))
 	{
 		exit_status = WEXITSTATUS(w_status);
-		//printf("\nexit_status = %d\n", exit_status);
-		if (exit_status)
+		if (exit_status < 0 || exit_status > 255)
+			exit (255);
+		else if (exit_status)
 			return (exit_status);
 	}
 	return (EXIT_SUCCESS);
