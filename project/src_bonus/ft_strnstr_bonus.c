@@ -1,32 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check_args.c                                       :+:      :+:    :+:   */
+/*   ft_strnstr_bonus.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/15 21:06:02 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/04 14:30:39 by rtakeshi         ###   ########.fr       */
+/*   Created: 2021/09/05 12:07:16 by rtakeshi          #+#    #+#             */
+/*   Updated: 2022/02/04 15:34:40 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/pipex.h"
+#include "../inc/pipex_bonus.h"
 
-/**
-**Program must have at least the following config
-**./pipex infile "cmd1" "cmd2" outfile
-**which would be argc == 5
-*/
-int	check_argc(int argc)
+char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 {
-	if (argc != 5)
+	size_t	h;
+	size_t	n;
+	size_t	aux;
+
+	h = 0;
+	n = ft_strlen(needle);
+	if (n == 0)
+		return ((char *)haystack);
+	while (haystack[h] && h < len)
 	{
-		errno = EINVAL;
-		perror("Error");
-		ft_putstr_fd("Pipex needs at least four arguments.\n", 1);
-		ft_putstr_fd("The correct pipex usage is \
-		\"./pipex infile \"cmd1\" \"cmd2\" outfile\".\n", 1);
-		return (errno);
+		aux = 0;
+		while ((haystack[h + aux] == needle[aux]) && ((h + aux) < len))
+		{
+			if (aux + 1 == n)
+				return ((char *)haystack + h);
+			aux++;
+		}
+		h++;
 	}
 	return (0);
 }

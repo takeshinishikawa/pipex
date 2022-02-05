@@ -1,25 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   pipex_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/01 17:21:56 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/04 14:27:31 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/05 19:41:49 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#ifndef PIPEX_BONUS_H
+# define PIPEX_BONUS_H
 
-# include <stdio.h> //tirar printf e incluid libc
-# include <unistd.h> //execve
-# include <fcntl.h> //read() open()
+# include <stdio.h>
+# include <unistd.h>
+# include <fcntl.h>
 # include <sys/wait.h>
 # include <stdlib.h>
 # include <errno.h>
 # include <stdlib.h>
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 128
+# endif
 
 typedef struct s_list
 {
@@ -36,6 +40,8 @@ typedef struct s_pipex
 	int		outfile_fd;
 	int		previous_fd;
 	int		cmd_qty;
+	int		here_doc;
+	char	*limiter;
 	int		offset;
 	t_list	*cmd_lst;
 	char	**paths;
@@ -52,7 +58,7 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putchar_fd(char c, int fd);
 char	*ft_strjoin(char const *s1, char const *s2);
-int		check_argc(int argc);
+int		check_argc(int argc, t_pipex *pipex);
 void	init_pipex(int argc, char *argv[], char *envp[], t_pipex *pipex);
 void	free_cmd_lst(t_pipex *pipex);
 void	free_paths(t_pipex	*pipex);
@@ -77,6 +83,12 @@ void	cmd_not_found(char *str, char *envp[]);
 void	permission_denied(char *str, char *envp[]);
 int		clean_child_process(t_pipex *pipex, int errnumber);
 int		check_exit(int w_status);
+int		first_cmd(t_pipex *pipex, int fd_read, int cmd_counter);
 void	free_prev_cmd(t_list *cmd);
+char	*ft_strjoin_gnl(char const *s1, char const *s2);
+char	*ft_strdup(const char *s1);
+size_t	ft_linelen(const char*s);
+char	*ft_linedup(const char *s1);
+int		get_next_line(int fd, char **line);
 
 #endif

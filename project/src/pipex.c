@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check_args.c                                       :+:      :+:    :+:   */
+/*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/15 21:06:02 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/04 14:30:39 by rtakeshi         ###   ########.fr       */
+/*   Created: 2021/12/13 21:47:06 by rtakeshi          #+#    #+#             */
+/*   Updated: 2022/02/05 19:48:36 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
 
 /**
-**Program must have at least the following config
-**./pipex infile "cmd1" "cmd2" outfile
-**which would be argc == 5
-*/
-int	check_argc(int argc)
+ * @Just the main calls
+ *
+ * @param argc at least 5
+ * @param argv 0-program_name, 1-infile, 2-cmd1, 3-cmd2 and 4-outfile
+ * @param envp environment variables
+ * @return int 0 if ended and 1 if error
+ */
+int	main(int argc, char *argv[], char *envp[])
 {
-	if (argc != 5)
-	{
-		errno = EINVAL;
-		perror("Error");
-		ft_putstr_fd("Pipex needs at least four arguments.\n", 1);
-		ft_putstr_fd("The correct pipex usage is \
-		\"./pipex infile \"cmd1\" \"cmd2\" outfile\".\n", 1);
-		return (errno);
-	}
-	return (0);
+	t_pipex	pipex;
+
+	if (check_argc(argc))
+		exit (EXIT_FAILURE);
+	init_pipex(argc, argv, envp, &pipex);
+	return (exec_pipex(&pipex, argv));
 }
