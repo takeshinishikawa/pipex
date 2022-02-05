@@ -6,16 +6,16 @@
 /*   By: rtakeshi <rtakeshi@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/01 17:21:56 by rtakeshi          #+#    #+#             */
-/*   Updated: 2022/02/04 14:27:31 by rtakeshi         ###   ########.fr       */
+/*   Updated: 2022/02/05 20:08:32 by rtakeshi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
 
-# include <stdio.h> //tirar printf e incluid libc
-# include <unistd.h> //execve
-# include <fcntl.h> //read() open()
+# include <stdio.h>
+# include <unistd.h>
+# include <fcntl.h>
 # include <sys/wait.h>
 # include <stdlib.h>
 # include <errno.h>
